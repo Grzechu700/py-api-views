@@ -1,3 +1,4 @@
+from django.http import Http404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -32,7 +33,7 @@ class GenreDetail(APIView):
         try:
             return Genre.objects.get(pk=pk)
         except Genre.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            raise Http404
 
     def get(self, request, pk):
         genre = self.get_object(pk)

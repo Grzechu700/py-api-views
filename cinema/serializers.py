@@ -1,6 +1,5 @@
 from rest_framework import serializers
-
-from cinema.models import Movie, Actor, Genre, CinemaHall
+from .models import Actor, Genre, CinemaHall, Movie
 
 
 class ActorSerializer(serializers.Serializer):
@@ -45,8 +44,8 @@ class CinemaHallSerializer(serializers.Serializer):
     def update(self, instance, validated_data):
         instance.name = validated_data.get("name", instance.name)
         instance.rows = validated_data.get("rows", instance.rows)
-        instance.seats_in_row = validated_data("seats_in_row",
-                                               instance.seats_in_row)
+        instance.seats_in_row = validated_data.get("seats_in_row",
+                                                   instance.seats_in_row)
         instance.save()
         return instance
 
@@ -55,7 +54,6 @@ class MovieSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=255)
     description = serializers.CharField()
-    duration = serializers.IntegerField()
     actors = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Actor.objects.all()
@@ -75,10 +73,12 @@ class MovieSerializer(serializers.Serializer):
         return movie
 
     def update(self, instance, validated_data):
-        instance.title = validated_data.get("title", instance.title)
+        instance.title = validated_data.get("title",
+                                            instance.title)
         instance.description = validated_data.get("description",
                                                   instance.description)
-        instance.duration = validated_data.get("duration", instance.duration)
+        instance.duration = validated_data.get("duration",
+                                               instance.duration)
 
         if "actors" in validated_data:
             instance.actors.set(validated_data["actors"])

@@ -10,6 +10,7 @@ from .views import (
 router = DefaultRouter()
 router.register(r"cinema/movies", MovieViewSet)
 router.register(r"cinema/cinema_halls", CinemaHallViewSet)
+app_name = "cinema"
 
 urlpatterns = [
     path("api/cinema/", include("cinema.urls", namespace="cinema")),

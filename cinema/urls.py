@@ -12,6 +12,7 @@ router.register(r"cinema/movies", MovieViewSet)
 router.register(r"cinema/cinema_halls", CinemaHallViewSet)
 
 urlpatterns = [
+    path("api/cinema/", include("cinema.urls", namespace="cinema")),
     path("cinema/genres/", GenreList.as_view(), name="genre-list"),
     path("cinema/genres/<int:pk>/",
          GenreDetail.as_view(),

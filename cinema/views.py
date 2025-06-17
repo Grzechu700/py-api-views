@@ -110,6 +110,9 @@ class ActorRetrieveUpdateDestroy(generics.GenericAPIView,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
+ActorDetail = ActorRetrieveUpdateDestroy
+ActorList = ActorListCreate
+
 
 class CinemaHallViewSet(viewsets.GenericViewSet,
                         mixins.ListModelMixin,

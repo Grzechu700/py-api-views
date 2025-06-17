@@ -77,12 +77,9 @@ def movie_list(request):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ActorListCreate(generics.GenericAPIView,
-                      mixins.ListModelMixin,
-                      mixins.CreateModelMixin):
-    queryset = Actor.objects.all()
-    serializer_class = ActorSerializer
+    class ActorListCreate(generics.ListCreateAPIView):
+        queryset = Actor.objects.all()
+        serializer_class = ActorSerializer
 
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
@@ -91,28 +88,14 @@ class ActorListCreate(generics.GenericAPIView,
         return self.create(request, *args, **kwargs)
 
 
-class ActorRetrieveUpdateDestroy(generics.GenericAPIView,
-                                 mixins.RetrieveModelMixin,
-                                 mixins.UpdateModelMixin,
-                                 mixins.DestroyModelMixin):
+class ActorDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
-    def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-    def patch(self, request, *args, **kwargs):
-        return self.partial_update(request, *args, **kwargs)
-
     def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
-
-
-ActorDetail = ActorRetrieveUpdateDestroy
-ActorList = ActorListCreate
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CinemaHallViewSet(viewsets.GenericViewSet,
@@ -128,6 +111,18 @@ class CinemaHallViewSet(viewsets.GenericViewSet,
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+    def partial_update(self, request, *args, **kwargs):
+        kwargs['partial'] = True
+        return self.update(request, *args, **kwargs)
 
 
 @api_view(["GET", "PUT", "DELETE"])

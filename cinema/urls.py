@@ -7,12 +7,11 @@ from .views import (
     MovieViewSet
 )
 
-app_name = "cinema"
-
-
 router = DefaultRouter()
 router.register(r"cinema/movies", MovieViewSet)
 router.register(r"cinema/cinema_halls", CinemaHallViewSet)
+
+app_name = "cinema"
 
 urlpatterns = [
     path("cinema/genres/", GenreList.as_view(),

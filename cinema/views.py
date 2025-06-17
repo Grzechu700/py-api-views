@@ -78,7 +78,9 @@ def movie_list(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ActorListCreate(generics.ListCreateAPIView):
+class ActorListCreate(generics.GenericAPIView,
+                      mixins.ListModelMixin,
+                      mixins.CreateModelMixin):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
@@ -86,17 +88,39 @@ class ActorListCreate(generics.ListCreateAPIView):
         return self.list(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
+    def perform_create(self, serializer):
+        serializer.save()
 
-class ActorDetail(generics.RetrieveUpdateDestroyAPIView):
+class ActorRetrieveUpdateDestroy(generics.GenericAPIView,
+                                 mixins.RetrieveModelMixin,
+                                 mixins.UpdateModelMixin,
+                                 mixins.DestroyModelMixin):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def patch(self, request, *args, **kwargs):
+        return self.partial_update(request, *args, **kwargs)
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+ActorList = ActorListCreate
+ActorDetail = ActorRetrieveUpdateDestroy
 
 
 class CinemaHallViewSet(viewsets.GenericViewSet,

@@ -13,7 +13,6 @@ router.register(r"cinema/cinema_halls", CinemaHallViewSet)
 app_name = "cinema"
 
 urlpatterns = [
-    path("api/cinema/", include("cinema.urls", namespace="cinema")),
     path("cinema/genres/", GenreList.as_view(), name="genre-list"),
     path("cinema/genres/<int:pk>/",
          GenreDetail.as_view(),

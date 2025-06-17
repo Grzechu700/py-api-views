@@ -2,25 +2,26 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     GenreList, GenreDetail,
-    ActorListCreate, ActorDetail,
+    ActorListCreate, ActorRetrieveUpdateDestroy,
     CinemaHallViewSet,
     MovieViewSet
 )
 
 router = DefaultRouter()
-router.register(r"cinema/movies", MovieViewSet)
-router.register(r"cinema/cinema_halls", CinemaHallViewSet)
+router.register(r"movies", MovieViewSet, basename="movie")
+router.register(r"cinema_halls", CinemaHallViewSet, basename="cinema_hall")
 
 app_name = "cinema"
 
 urlpatterns = [
-    path("cinema/genres/", GenreList.as_view(),
+    path("genres/", GenreList.as_view(),
          name="genre-list"),
-    path("cinema/genres/<int:pk>/", GenreDetail.as_view(),
+    path("genres/<int:pk>/", GenreDetail.as_view(),
          name="genre-detail"),
-    path("cinema/actors/", ActorListCreate.as_view(),
+    path("actors/", ActorListCreate.as_view(),
          name="actor-list"),
-    path("cinema/actors/<int:pk>/", ActorDetail.as_view(),
+    path("actors/<int:pk>/",
+         ActorRetrieveUpdateDestroy.as_view(),
          name="actor-detail"),
-    path("cinema/", include(router.urls)),
+    path("", include(router.urls)),
 ]

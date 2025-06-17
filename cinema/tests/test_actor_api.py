@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status, generics, mixins, viewsets
-from rest_framework.test import APIClient
+from rest_framework.test import APIClient, APITestCase
 
 from cinema.serializers import ActorSerializer
 from cinema.models import Actor
@@ -13,6 +13,7 @@ from cinema.views import (ActorListCreate as ActorList,
 class ActorApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+        Actor.objects.all().delete()
         Actor.objects.create(first_name="George", last_name="Clooney")
         Actor.objects.create(first_name="Keanu", last_name="Reeves")
 
@@ -40,17 +41,18 @@ class ActorApiTests(TestCase):
         self.assertFalse(issubclass(ActorDetail, viewsets.GenericViewSet))
 
     def test_get_actors(self):
-        url = reverse('actor-list')
+        url = reverse('cinema:actor-list')
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
 
     def test_post_actors(self):
-        url = reverse('actor-list')
+        url = reverse('cinema:actor-list')
         data = {"first_name": "John", "last_name": "Doe"}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Actor.objects.count(), 1)
-        self.assertEqual(Actor.objects.get().first_name, "John")
+        self.assertEqual(Actor.objects.count(), 3)  # Początkowo 2, dodajemy 1
+        self.assertEqual(Actor.objects.last().first_name, "John")
 
     def test_get_actor(self):
         actor = Actor.objects.create(first_name="John", last_name="Doe")
@@ -59,12 +61,12 @@ class ActorApiTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_invalid_actor(self):
-        response = self.client.get("/api/cinema/actors/1001/")
+        response = self.client.get(reverse('cinema:actor-detail', args=[1001]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_put_actor(self):
         actor = Actor.objects.create(first_name="John", last_name="Doe")
-        url = reverse('actor-detail', args=[actor.id])
+        url = reverse('cinema:actor-detail', args=[actor.id])
         data = {"first_name": "Jane", "last_name": "Doe"}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -73,7 +75,7 @@ class ActorApiTests(TestCase):
 
     def test_patch_actor(self):
         actor = Actor.objects.create(first_name="John", last_name="Doe")
-        url = reverse('actor-detail', args=[actor.id])
+        url = reverse('cinema:actor-detail', args=[actor.id])
         data = {"first_name": "Jane"}
         response = self.client.patch(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -82,13 +84,11 @@ class ActorApiTests(TestCase):
 
     def test_delete_actor(self):
         actor = Actor.objects.create(first_name="John", last_name="Doe")
-        url = reverse('actor-detail', args=[actor.id])
+        url = reverse('cinema:actor-detail', args=[actor.id])
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Actor.objects.count(), 0)
+        self.assertEqual(Actor.objects.count(), 2)
 
     def test_delete_invalid_actor(self):
-        response = self.client.delete(
-            "/api/cinema/actors/1000/",
-        )
+        response = self.client.delete(reverse('cinema:actor-detail', args=[1000]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)

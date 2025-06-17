@@ -12,9 +12,13 @@ router.register(r"cinema/movies", MovieViewSet)
 router.register(r"cinema/cinema_halls", CinemaHallViewSet)
 
 urlpatterns = [
-    path("cinema/genres/", GenreList.as_view(), name="genre-list"),
-    path("cinema/genres/<int:pk>/", GenreDetail.as_view(), name="genre-detail"),
-    path("cinema/actors/", ActorListCreate.as_view(), name="actor-list"),
-    path("cinema/actors/<int:pk>/", ActorDetail.as_view(), name="actor-detail"),
+    path("cinema/genres/", GenreList.as_view(),
+         name="genre-list"),
+    path("cinema/genres/<int:pk>/", GenreDetail.as_view(),
+         name="genre-detail"),
+    path("cinema/actors/", ActorListCreate.as_view(),
+         name="actor-list"),
+    path("cinema/actors/<int:pk>/", ActorDetail.as_view(),
+         name="actor-detail"),
     path("cinema/", include(router.urls)),
 ]

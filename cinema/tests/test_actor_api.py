@@ -5,7 +5,7 @@ from rest_framework.test import APIClient
 
 from cinema.serializers import ActorSerializer
 from cinema.models import Actor
-from cinema.views import ActorListCreate, ActorDetail
+from cinema.views import ActorListCreate, ActorRetrieveUpdateDestroy
 
 
 class ActorApiTests(TestCase):

@@ -51,6 +51,16 @@ class CinemaHallSerializer(serializers.Serializer):
 
 
 class MovieSerializer(serializers.Serializer):
+    class Meta:
+        model = Movie
+        fields = ['id', 'title', 'description', 'duration']
+        extra_kwargs = {
+            'duration': {
+                'min_value': 1,
+                'max_value': 500
+            }
+        }
+
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=255)
     description = serializers.CharField()

@@ -56,7 +56,7 @@ class ActorApiTests(TestCase):
 
     def test_get_actor(self):
         actor = Actor.objects.create(first_name="John", last_name="Doe")
-        url = reverse('actor-detail', args=[actor.id])
+        url = reverse("cinema:actor-detail", args=[actor.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 

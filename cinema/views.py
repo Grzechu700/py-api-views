@@ -150,9 +150,8 @@ class MovieViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response(serializer.data)
 
-    def partial_update(self, request, *args, **kwargs):
-        kwargs["partial"] = True
-        return self.update(request, *args, **kwargs)
+    def perform_update(self, serializer):
+        serializer.save()
 
 
 @api_view(["GET", "PUT", "DELETE"])

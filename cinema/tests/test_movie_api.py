@@ -25,6 +25,7 @@ class MovieApiTests(TestCase):
             title="Batman",
             description="Batman description",
             duration=190,
+            rating=4.0,
         )
 
     def test_movie_viewset_is_subclass_model_viewset(self):
@@ -44,9 +45,10 @@ class MovieApiTests(TestCase):
             "description": "Superman description",
             "duration": 170,
             "release_date": "2025-01-01",
-            "rating": 4.5,
+            "rating": 4.7,
         }
         response = self.client.post(url, data, format='json')
+        print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Movie.objects.count(), 3)
         self.assertEqual(Movie.objects.filter(title="Superman").count(), 1)
@@ -82,9 +84,10 @@ class MovieApiTests(TestCase):
             "description": "Watchman description",
             "duration": 190,
             "release_date": "2025-06-01",
-            "rating": 5.0,
+            "rating": 4.8,
         }
         response = self.client.put(url, data, format='json')
+        print(response.data)
         db_movie = Movie.objects.get(id=self.movie1.id)
         self.assertEqual(db_movie.title, "Watchman")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

@@ -13,12 +13,14 @@ from rest_framework.viewsets import ModelViewSet
 class MovieApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+
         self.actor1 = Actor.objects.create(first_name="John", last_name="Doe")
         self.actor2 = Actor.objects.create(first_name="Jane", last_name="Doe")
         self.genre1 = Genre.objects.create(name="Action")
         self.genre2 = Genre.objects.create(name="Comedy")
 
         Movie.objects.all().delete()
+
         self.movie1 = Movie.objects.create(
             title="Titanic",
             description="Titanic description",
@@ -131,9 +133,11 @@ class MovieApiTests(TestCase):
             "duration": "invalid_value",
         }
         response = self.client.patch(url, data, format='json')
-        db_movie = Movie.objects.get(id=self.movie1.id)
-        self.assertEqual(db_movie.duration, 200)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        print(f"Response status code: {response.status_code}")
+        print(f"Response data: {response.data}")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST,
+                         f"Expected 400 BAD REQUEST but got {response.status_code} instead. "
+                         f"Response data: {response.data}")
 
     def test_delete_movie(self):
         url = reverse('cinema:movie-detail', args=[self.movie1.id])

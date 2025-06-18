@@ -50,7 +50,13 @@ class CinemaHallSerializer(serializers.Serializer):
         return instance
 
 
-class MovieSerializer(serializers.Serializer):
+class MovieSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField()
+    duration = serializers.IntegerField(min_value=1, max_value=500)
+    release_date = serializers.DateField(required=False)
+    rating = serializers.FloatField(required=False, allow_null=True)
     actors = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Actor.objects.all()
@@ -66,6 +72,7 @@ class MovieSerializer(serializers.Serializer):
                   "title",
                   "description",
                   "duration",
+                  "release_date",
                   "rating",
                   "actors",
                   "genres"]
@@ -81,14 +88,29 @@ class MovieSerializer(serializers.Serializer):
         }
 
     def validate_duration(self, value):
-        if isinstance(value, str) and not value.isdigit():
+        try:
+            if isinstance(value, str):
+                if not value.isdigit():
+                    raise serializers.ValidationError(
+                        "Duration must be a positive integer.")
+                value = int(value)
+            if not isinstance(value, (int, float)):
+                raise serializers.ValidationError(
+                    "Duration must be a positive integer.")
+            if isinstance(value, (int, float)) and (value < 1 or value > 500):
+                raise serializers.ValidationError(
+                    "Duration must be between 1 and 500.")
+            return value
+        except (ValueError, TypeError):
             raise serializers.ValidationError(
-                "Duration must be a positive integer.")
-        return value
+                "Duration must be a positive integer between 1 and 500.")
 
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField()
+    def validate(self, data):
+        if "duration" in data:
+            duration = data.get("duration")
+            if duration is not None:
+                data["duration"] = self.validate_duration(duration)
+        return data
 
     def create(self, validated_data):
         actors = validated_data.pop("actors")

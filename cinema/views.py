@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics, viewsets
 from rest_framework import mixins
+from rest_framework import serializers
 
 from django.shortcuts import get_object_or_404
 
@@ -140,22 +141,34 @@ class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all()
     serializer_class = MovieSerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data,
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
+    def partial_update(self, request, *args, **kwargs):
+        kwargs["partial"] = True
+        return self.update(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
         instance = self.get_object()
-        serializer = self.get_serializer(instance,
-                                         data=request.data,
-                                         partial=partial)
-        serializer.is_valid(raise_exception=True)
+
+        data = request.data.copy()
+
+        if partial and "actors" not in data:
+            data["actors"] = list(instance.actors.values_list("id", flat=True))
+        if partial and "genres" not in data:
+            data["genres"] = list(instance.genres.values_list("id", flat=True))
+
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except serializers.ValidationError as e:
+            return Response(
+                {
+                    "error": "Invalid data",
+                    "details": e.detail
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         self.perform_update(serializer)
         return Response(serializer.data)
 

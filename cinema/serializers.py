@@ -53,11 +53,11 @@ class CinemaHallSerializer(serializers.Serializer):
 class MovieSerializer(serializers.Serializer):
     class Meta:
         model = Movie
-        fields = ['id', 'title', 'description', 'duration']
+        fields = ["id", "title", "description", "duration"]
         extra_kwargs = {
-            'duration': {
-                'min_value': 1,
-                'max_value': 500
+            "duration": {
+                "min_value": 1,
+                "max_value": 500
             }
         }
 

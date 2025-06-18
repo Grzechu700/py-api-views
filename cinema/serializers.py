@@ -51,23 +51,6 @@ class CinemaHallSerializer(serializers.Serializer):
 
 
 class MovieSerializer(serializers.Serializer):
-    class Meta:
-        model = Movie
-        fields = ["id", "title", "description", "duration", "rating"]
-        extra_kwargs = {
-            "duration": {
-                "min_value": 1,
-                "max_value": 500
-            },
-            "rating": {
-                "required": False,
-                "allow_null": True
-            }
-        }
-
-    id = serializers.IntegerField(read_only=True)
-    title = serializers.CharField(max_length=255)
-    description = serializers.CharField()
     actors = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Actor.objects.all()
@@ -76,7 +59,30 @@ class MovieSerializer(serializers.Serializer):
         many=True,
         queryset=Genre.objects.all()
     )
-    duration = serializers.IntegerField()
+
+    class Meta:
+        model = Movie
+        fields = ["id",
+                  "title",
+                  "description",
+                  "duration",
+                  "rating",
+                  "actors",
+                  "genres"]
+        extra_kwargs = {
+            'duration': {
+                'min_value': 1,
+                'max_value': 500
+            },
+            'rating': {
+                'required': False,
+                'allow_null': True
+            }
+        }
+
+    id = serializers.IntegerField(read_only=True)
+    title = serializers.CharField(max_length=255)
+    description = serializers.CharField()
 
     def create(self, validated_data):
         actors = validated_data.pop("actors")

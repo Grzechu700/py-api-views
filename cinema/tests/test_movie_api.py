@@ -5,7 +5,7 @@ from rest_framework.test import APIClient, APITestCase
 from rest_framework import status
 
 from cinema.serializers import MovieSerializer
-from cinema.models import Movie
+from cinema.models import Movie, Actor, Genre
 from cinema.views import MovieViewSet
 from rest_framework.viewsets import ModelViewSet
 
@@ -13,20 +13,29 @@ from rest_framework.viewsets import ModelViewSet
 class MovieApiTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.actor1 = Actor.objects.create(first_name="John", last_name="Doe")
+        self.actor2 = Actor.objects.create(first_name="Jane", last_name="Doe")
+        self.genre1 = Genre.objects.create(name="Action")
+        self.genre2 = Genre.objects.create(name="Comedy")
+
         Movie.objects.all().delete()
         self.movie1 = Movie.objects.create(
             title="Titanic",
             description="Titanic description",
             duration=200,
-            release_date="2000-01-01",
             rating=4.5,
         )
+        self.movie1.actors.add(self.actor1, self.actor2)
+        self.movie1.genres.add(self.genre1, self.genre2)
+
         self.movie2 = Movie.objects.create(
             title="Batman",
             description="Batman description",
             duration=190,
             rating=4.0,
         )
+        self.movie2.actors.add(self.actor1, self.actor2)
+        self.movie2.genres.add(self.genre1, self.genre2)
 
     def test_movie_viewset_is_subclass_model_viewset(self):
         self.assertTrue(issubclass(MovieViewSet, ModelViewSet))
@@ -44,8 +53,9 @@ class MovieApiTests(TestCase):
             "title": "Superman",
             "description": "Superman description",
             "duration": 170,
-            "release_date": "2025-01-01",
             "rating": 4.7,
+            "actors": [self.actor1.id, self.actor2.id],
+            "genres": [self.genre1.id, self.genre2.id],
         }
         response = self.client.post(url, data, format='json')
         print(response.data)
@@ -83,8 +93,9 @@ class MovieApiTests(TestCase):
             "title": "Watchman",
             "description": "Watchman description",
             "duration": 190,
-            "release_date": "2025-06-01",
             "rating": 4.8,
+            "actors": [self.actor1.id, self.actor2.id],
+            "genres": [self.genre1.id, self.genre2.id],
         }
         response = self.client.put(url, data, format='json')
         print(response.data)

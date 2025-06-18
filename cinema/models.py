@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 
 class Actor(models.Model):
@@ -29,8 +30,8 @@ class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     duration = models.PositiveIntegerField()
-    release_date = models.DateField()
-    rating = models.FloatField()
+    release_date = models.DateField(default=date.today)
+    rating = models.FloatField(default=0.0)
     actors = models.ManyToManyField(Actor, related_name="movies")
     genres = models.ManyToManyField(Genre, related_name="movies")
 

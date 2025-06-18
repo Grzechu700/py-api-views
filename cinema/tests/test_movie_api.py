@@ -18,6 +18,8 @@ class MovieApiTests(TestCase):
             title="Titanic",
             description="Titanic description",
             duration=200,
+            release_date="2000-01-01",
+            rating=4.5,
         )
         self.movie2 = Movie.objects.create(
             title="Batman",
@@ -41,12 +43,13 @@ class MovieApiTests(TestCase):
             "title": "Superman",
             "description": "Superman description",
             "duration": 170,
+            "release_date": "2025-01-01",
+            "rating": 4.5,
         }
         response = self.client.post(url, data, format='json')
-        db_movies = Movie.objects.all()
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(db_movies.count(), 3)
-        self.assertEqual(db_movies.filter(title="Superman").count(), 1)
+        self.assertEqual(Movie.objects.count(), 3)
+        self.assertEqual(Movie.objects.filter(title="Superman").count(), 1)
 
     def test_post_invalid_movies(self):
         url = reverse('cinema:movie-list')
@@ -78,6 +81,8 @@ class MovieApiTests(TestCase):
             "title": "Watchman",
             "description": "Watchman description",
             "duration": 190,
+            "release_date": "2025-06-01",
+            "rating": 5.0,
         }
         response = self.client.put(url, data, format='json')
         db_movie = Movie.objects.get(id=self.movie1.id)

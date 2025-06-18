@@ -72,7 +72,7 @@ class MovieSerializer(serializers.Serializer):
         extra_kwargs = {
             "duration": {
                 "min_value": 1,
-                'max_value': 500
+                "max_value": 500
             },
             "rating": {
                 "required": False,

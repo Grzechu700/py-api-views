@@ -70,13 +70,13 @@ class MovieSerializer(serializers.Serializer):
                   "actors",
                   "genres"]
         extra_kwargs = {
-            'duration': {
-                'min_value': 1,
+            "duration": {
+                "min_value": 1,
                 'max_value': 500
             },
-            'rating': {
-                'required': False,
-                'allow_null': True
+            "rating": {
+                "required": False,
+                "allow_null": True
             }
         }
 

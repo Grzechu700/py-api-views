@@ -29,7 +29,7 @@ class CinemaHall(models.Model):
 class Movie(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
-    duration = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField(default=90)
     release_date = models.DateField(default=date.today)
     rating = models.FloatField(default=0.0)
     actors = models.ManyToManyField("Actor", related_name="movies")

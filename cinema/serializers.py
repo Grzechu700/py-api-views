@@ -80,6 +80,12 @@ class MovieSerializer(serializers.Serializer):
             }
         }
 
+    def validate_duration(self, value):
+        if isinstance(value, str) and not value.isdigit():
+            raise serializers.ValidationError(
+                "Duration must be a positive integer.")
+        return value
+
     id = serializers.IntegerField(read_only=True)
     title = serializers.CharField(max_length=255)
     description = serializers.CharField()

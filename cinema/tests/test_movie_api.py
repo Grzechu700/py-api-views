@@ -128,7 +128,7 @@ class MovieApiTests(TestCase):
     def test_patch_invalid_movie(self):
         url = reverse('cinema:movie-detail', args=[self.movie1.id])
         data = {
-            "duration": "fifty",
+            "duration": "invalid_value",
         }
         response = self.client.patch(url, data, format='json')
         db_movie = Movie.objects.get(id=self.movie1.id)
